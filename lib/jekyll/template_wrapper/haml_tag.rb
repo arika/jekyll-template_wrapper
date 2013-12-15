@@ -55,6 +55,11 @@ module Jekyll
       end
 
       def render(context)
+        if context.scopes.size == 1
+          page = context.registers[:page]
+          Jekyll.logger.debug('HamlTag:', "rendering #{page.inspect}")
+        end
+
         haml_text = super
         if @@cache[haml_text]
           @@cache_status[:hit] += 1
@@ -64,7 +69,14 @@ module Jekyll
           @@cache_status[:miss] += 1
           @@cache_status[:use][haml_text] = 1
         end
+
         @@cache[haml_text].render(Buffer.new(context), context)
+      rescue Exception
+        Jekyll.logger.debug('HamlTag:', "Exception: #{$!.message} #{$!.class}")
+        $!.backtrace.each do |line|
+          Jekyll.logger.debug('HamlTag:', "\t#{line}")
+        end
+        raise
       end
     end # HamlBlock
   end
