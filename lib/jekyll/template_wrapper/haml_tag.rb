@@ -20,7 +20,7 @@ module Jekyll
     # jekyllによるliquidテンプレートの
     # コンパイルの中で実施される。
     class HamConverter < Jekyll::Converter
-      safe true
+      safe false # User can do anything by Ruby code in Haml layout/include files.
       priority :low
 
       def matches(ext)
